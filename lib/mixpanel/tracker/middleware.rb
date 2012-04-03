@@ -73,12 +73,12 @@ module Mixpanel
       end
       
       def is_skip_controller?
+        result = false
         unless @options[:skip].blank?
           @options[:skip].each do |controller|
             result = @request.fullpath.match(controller).nil? ? false : true
           end
         end
-        result = result || false
         return result
       end
 
@@ -86,6 +86,7 @@ module Mixpanel
         if @options[:async]
             <<-EOT
           <script type='text/javascript'>
+            // primitus mixpanel gem
             var mpq = [];
             mpq.push(["init", "#{@token}"]);
             (function(){var b,a,e,d,c;b=document.createElement("script");b.type="text/javascript";b.async=true;b.src=(document.location.protocol==="https:"?"https:":"http:")+"//api.mixpanel.com/site_media/js/api/mixpanel.js";a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(b,a);e=function(f){return function(){mpq.push([f].concat(Array.prototype.slice.call(arguments,0)))}};d=["track","track_links","track_forms","register","register_once","identify","name_tag","set_config"];for(c=0;c<d.length;c++){mpq[d[c]]=e(d[c])}})();
@@ -94,6 +95,7 @@ module Mixpanel
         else
           <<-EOT
         <script type='text/javascript'>
+          // primitus mixpanel gem
           var mp_protocol = (('https:' == document.location.protocol) ? 'https://' : 'http://');
           document.write(unescape('%3Cscript src="' + mp_protocol + 'api.mixpanel.com/site_media/js/api/mixpanel.js" type="text/javascript"%3E%3C/script%3E'));
         </script>
