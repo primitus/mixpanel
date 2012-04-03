@@ -8,12 +8,14 @@ module Mixpanel
         @token = mixpanel_token
         @options = {
           :async => false,
-          :insert_js_last => false
+          :insert_js_last => false,
+          :skip => []
         }.merge(options)
       end
 
       def call(env)
         @env = env
+        @request = Rack::Request.new(env)
 
         @status, @headers, @response = @app.call(env)
 
@@ -67,7 +69,17 @@ module Mixpanel
       end
 
       def is_trackable_response?
-        is_html_response? || is_javascript_response?
+        is_html_response? || is_javascript_response? || !is_skip_controller?
+      end
+      
+      def is_skip_controller?
+        unless @options[:skip].blank?
+          @options[:skip].each do |controller|
+            result = @request.fullpath.match(controller).nil? ? false : true
+          end
+        end
+        result = result || false
+        return result
       end
 
       def render_mixpanel_scripts
